@@ -48,9 +48,9 @@ with tab1:
         T = st.slider("保险期限 T (月)", min_value=1, max_value=12, value=6)
     
     with col2:
-        sigma = st.slider("价格波动率 σ", min_value=0.1, max_value=0.8, value=0.25, step=0.05)
-        r = st.slider("无风险利率 r", min_value=0.01, max_value=0.10, value=0.03, step=0.01)
-        Q = st.number_input("承保数量 Q (吨)", min_value=1, max_value=1000, value=100, step=10)
+        sigma = st.slider("价格波动率 σ", min_value=0.1, max_value=0.8, value=0.25, step=0.05,key="sigma_volatility")
+        r = st.slider("无风险利率 r", min_value=0.01, max_value=0.10, value=0.03, step=0.01,key="risk_free_rate")
+        Q = st.number_input("承保数量 Q (吨)", min_value=1, max_value=1000, value=100, step=10,key="quantity_insured")
     
     with col3:
         premium_rate = st.slider("保费率 (%)", min_value=1.0, max_value=20.0, value=8.0, step=0.5)
@@ -346,10 +346,10 @@ with tab2:
     with col1:
         st.subheader("⚙️ 定价参数")
         
-        S_base = st.number_input("现货价格 S₀", min_value=1.0, value=3.0, step=0.1)
-        K_base = st.number_input("执行价格 K", min_value=1.0, value=3.0, step=0.1)
-        T_base = st.slider("到期时间 T (年)", 0.1, 2.0, 0.5, 0.1)
-        r_base = st.slider("无风险利率 r", 0.01, 0.10, 0.03, 0.01)
+        S_base = st.number_input("现货价格 S₀", min_value=1.0, value=3.0, step=0.1,key="spot_price_base")
+        K_base = st.number_input("执行价格 K", min_value=1.0, value=3.0, step=0.1,key="strike_price_base")
+        T_base = st.slider("到期时间 T (年)", 0.1, 2.0, 0.5, 0.1,key="time_to_maturity_base")
+        r_base = st.slider("无风险利率 r", 0.01, 0.10, 0.03, 0.01,key="risk_free_rate_base")
         
         st.divider()
         
@@ -587,7 +587,7 @@ with tab3:
         has_history = st.checkbox("是否有历史投保记录", value=True)
         
         if has_history:
-            claim_history = st.slider("过去3年理赔次数", 0, 10, 2)
+            claim_history = st.slider("过去3年理赔次数", 0, 10, 2,key="claim_history_count")
         else:
             claim_history = 0
         
