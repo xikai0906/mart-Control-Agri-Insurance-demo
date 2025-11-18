@@ -223,7 +223,7 @@ st.info("""
 st.divider()
 st.markdown("""
 <div style="text-align: center; color: #666; padding: 2rem 0;">
-    <p>🎓 广西财经学院 | 第十二届"挑战杯"广西大学生课外学术科技作品竞赛</p>
+    <p>🎓 广西财经学院 | 智控农险</p>
     <p>📧 联系我们: zhikong-nongxian@example.com</p>
 </div>
 """, unsafe_allow_html=True)
