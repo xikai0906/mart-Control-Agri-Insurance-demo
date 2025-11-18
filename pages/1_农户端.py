@@ -453,4 +453,4 @@ with tab4:
 
 # 页脚帮助信息
 st.divider()
-st.info("💡 **使用帮助:** 如有疑问请联系客服热线: 400-XXX-XXXX 或访问帮助中心")
+st.info("💡 **使用帮助:** 如有疑问请联系技术部ysuy5756@gmail.com 或访问帮助中心")
