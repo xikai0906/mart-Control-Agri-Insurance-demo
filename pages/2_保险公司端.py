@@ -103,7 +103,7 @@ with tab1:
     payout_data = pd.DataFrame({
         'month': months,
         'actual': [120, 135, 150, 180, 160, 200, 190, 210, 185, 195, 220, 240],
-        'predicted': [None]*10 + [230, 245, 255]
+        'predicted': [None]*10 + [230, 245]
     })
     
     fig_payout = go.Figure()
