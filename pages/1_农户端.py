@@ -354,7 +354,13 @@ with tab3:
                 ["台风", "暴雨", "洪涝", "干旱", "冰雹", "其他"])
             affected_area = st.number_input("受灾面积(亩)", 
                 min_value=0.0, max_value=planting_area, value=0.0, step=0.5)
-            damage_level = st.slider("受损程度(%)", 0, 100, 50)
+            damage_level = st.slider("受损程度(%)",
+                                     min_value=1,      # 最小1%
+                                     max_value=100,    # 最大100%
+                                     value=50,         # 默认50%
+                                     step=1,           # 步长1%
+                                     key="受损程度",
+                                     help="请根据实际情况选择受损程度")
         
         with col2:
             st.markdown("**上传受灾照片**")
