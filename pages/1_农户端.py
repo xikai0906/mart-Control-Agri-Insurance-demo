@@ -6,6 +6,11 @@ import plotly.express as px
 from datetime import datetime, timedelta
 
 st.set_page_config(page_title="农户端", page_icon="👨‍🌾", layout="wide")
+# 顶部导航
+col_nav1, col_nav2 = st.columns([1, 4])
+with col_nav1:
+    if st.button("🏠 返回首页", use_container_width=True):
+        st.switch_page("app.py")
 
 st.title("👨‍🌾 农户服务平台")
 st.markdown("---")
