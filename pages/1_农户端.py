@@ -352,15 +352,50 @@ with tab3:
             disaster_date = st.date_input("灾害发生日期")
             disaster_type = st.selectbox("灾害类型", 
                 ["台风", "暴雨", "洪涝", "干旱", "冰雹", "其他"])
-            affected_area = st.number_input("受灾面积(亩)", 
-                min_value=0.0, max_value=planting_area, value=0.0, step=0.5)
-            damage_level = st.slider("受损程度(%)",
-                                     min_value=1,      # 最小1%
-                                     max_value=100,    # 最大100%
-                                     value=50,         # 默认50%
-                                     step=1,           # 步长1%
-                                     key="受损程度",
-                                     help="请根据实际情况选择受损程度")
+            
+            # 受灾面积 - 修改为更灵活的输入方式
+            st.markdown("**受灾面积(亩)**")
+            area_input_method = st.radio(
+                "选择输入方式",
+                ["滑块选择", "手动输入"],
+                horizontal=True,
+                key="面积输入方式",
+                label_visibility="collapsed"
+            )
+            
+            if area_input_method == "滑块选择":
+                # 根据种植面积设置最大值
+                max_area = max(100, planting_area)
+                affected_area = st.slider(
+                    "受灾面积(亩)",
+                    min_value=0.0,
+                    max_value=float(max_area),
+                    value=min(10.0, planting_area),
+                    step=0.5,
+                    key="受灾面积_滑块",
+                    help=f"最大可选{max_area}亩"
+                )
+            else:
+                affected_area = st.number_input(
+                    "受灾面积(亩)",
+                    min_value=0.0,
+                    max_value=10000.0,
+                    value=10.0,
+                    step=0.5,
+                    key="受灾面积_输入",
+                    help="请输入实际受灾面积"
+                )
+            
+            # 受损程度 - 修改范围为1-100%
+            damage_level = st.slider(
+                "受损程度(%)",
+                min_value=1,
+                max_value=100,
+                value=50,
+                step=1,
+                key="受损程度_天气",
+                help="请根据实际情况选择受损程度(1-100%)"
+            )
         
         with col2:
             st.markdown("**上传受灾照片**")
@@ -375,16 +410,22 @@ with tab3:
                     time.sleep(1)
                     st.success(f"✅ AI识别: {disaster_type}灾害, 受损程度约{damage_level}%")
         
-        st.text_area("补充说明", placeholder="请描述灾害情况...")
+        st.text_area("补充说明", placeholder="请描述灾害情况...", key="补充说明_天气")
         
         # 计算预计赔付
         compensation = affected_area * 5000 * (damage_level / 100)
         
+        st.divider()
+        
         col_a, col_b = st.columns([2, 1])
         with col_a:
-            st.info(f"💰 **预计赔付金额:** ¥{compensation:,.0f}")
+            st.info(f"""
+            💰 **预计赔付金额:** ¥{compensation:,.0f}
+            
+            📝 **计算方式:** {affected_area}亩 × ¥5,000/亩 × {damage_level}% = ¥{compensation:,.0f}
+            """)
         with col_b:
-            if st.button("🚀 提交理赔申请", type="primary", use_container_width=True):
+            if st.button("🚀 提交理赔申请", type="primary", use_container_width=True, key="提交天气理赔"):
                 st.success("✅ 理赔申请已提交,审核中...")
                 st.balloons()
     
@@ -406,14 +447,20 @@ with tab3:
             st.markdown("**上传销售凭证**")
             receipt_file = st.file_uploader("上传收购单/发票", type=['jpg', 'png', 'pdf'])
         
+        st.divider()
+        
         if actual_price < insured_price:
             price_diff = insured_price - actual_price
             compensation = price_diff * sale_amount
             
             st.error(f"🔔 **触发理赔条件:** 实际价格低于保险价格 ¥{price_diff:.2f}/斤")
-            st.success(f"💰 **预计赔付金额:** ¥{compensation:,.2f}")
+            st.success(f"""
+            💰 **预计赔付金额:** ¥{compensation:,.2f}
             
-            if st.button("🚀 提交理赔申请", type="primary", use_container_width=True):
+            📝 **计算方式:** (¥{insured_price:.2f} - ¥{actual_price:.2f}) × {sale_amount:,.0f}斤 = ¥{compensation:,.2f}
+            """)
+            
+            if st.button("🚀 提交理赔申请", type="primary", use_container_width=True, key="提交价格理赔"):
                 st.success("✅ 理赔申请已提交,审核中...")
                 st.balloons()
         else:
