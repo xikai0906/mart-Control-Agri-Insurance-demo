@@ -48,17 +48,17 @@ st.markdown("### 🧭 快速导航")
 nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
 
 with nav_col1:
-    if st.button("👨‍🌾 农户端", use_container_width=True, type="primary"):
+    if st.button("👨‍🌾 农户理赔平台", use_container_width=True, type="primary"):
         st.switch_page("pages/1_农户端.py")
     st.caption("天气预警 | 价格预测 | 理赔申请")
 
 with nav_col2:
-    if st.button("🏢 保险公司端", use_container_width=True, type="primary"):
+    if st.button("🏢 保险公司管理平台", use_container_width=True, type="primary"):
         st.switch_page("pages/2_保险公司端.py")
     st.caption("风险评估 | 智能审核 | 数据分析")
 
 with nav_col3:
-    if st.button("🤖 AI演示", use_container_width=True, type="primary"):
+    if st.button("🤖 AI演示平台", use_container_width=True, type="primary"):
         st.switch_page("pages/3_AI演示.py")
     st.caption("灾害识别 | 价格预测 | 自动理赔")
 
