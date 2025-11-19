@@ -43,6 +43,32 @@ st.markdown('<div class="sub-header">AI协同搭建农业"保险+衍生品"风�
 # 分隔线
 st.divider()
 
+# 顶部导航栏
+st.markdown("### 🧭 快速导航")
+nav_col1, nav_col2, nav_col3, nav_col4 = st.columns(4)
+
+with nav_col1:
+    if st.button("👨‍🌾 农户端", use_container_width=True, type="primary"):
+        st.switch_page("pages/1_农户端.py")
+    st.caption("天气预警 | 价格预测 | 理赔申请")
+
+with nav_col2:
+    if st.button("🏢 保险公司端", use_container_width=True, type="primary"):
+        st.switch_page("pages/2_保险公司端.py")
+    st.caption("风险评估 | 智能审核 | 数据分析")
+
+with nav_col3:
+    if st.button("🤖 AI演示", use_container_width=True, type="primary"):
+        st.switch_page("pages/3_AI演示.py")
+    st.caption("灾害识别 | 价格预测 | 自动理赔")
+
+with nav_col4:
+    if st.button("📊 量化模型", use_container_width=True, type="primary"):
+        st.switch_page("pages/4_量化模型后台.py")
+    st.caption("期权定价 | 核保理赔 | 风险分析")
+
+st.divider()
+
 # 项目介绍
 col1, col2, col3 = st.columns(3)
 
@@ -224,6 +250,6 @@ st.divider()
 st.markdown("""
 <div style="text-align: center; color: #666; padding: 2rem 0;">
     <p>🎓 广西财经学院 | 智控农险</p>
-    <p>📧 联系我们: zhikong-nongxian@example.com</p>
+    <p>📧 联系我们: ysuy5756@gmail.com</p>
 </div>
 """, unsafe_allow_html=True)
