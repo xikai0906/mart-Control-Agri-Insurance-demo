@@ -11,7 +11,7 @@ st.set_page_config(page_title="AI技术演示", page_icon="🤖", layout="wide")
 col_nav1, col_nav2 = st.columns([1, 4])
 with col_nav1:
     if st.button("🏠 返回首页", use_container_width=True):
-        st.rerun()
+        st.switch_page("app.py")  
 
 st.title("🤖 AI技术演示中心")
 st.markdown("---")
@@ -51,7 +51,7 @@ with tab1:
         if uploaded_file:
             st.image(uploaded_file, caption="待识别图片", use_container_width=True)
             
-            if st.button("🚀 开始AI识别", type="primary", use_container_width=True):
+            if st.button("🚀 开始AI识别", type="primary", use_container_width=True, key="识别按钮"):
                 
                 # 模拟AI识别过程
                 progress_bar = st.progress(0)
@@ -71,14 +71,25 @@ with tab1:
                     time.sleep(0.5)
                 
                 status_text.success("✅ 识别完成!")
+                st.session_state.识别完成 = True
     
     with col2:
-        if uploaded_file:
+        if uploaded_file and st.session_state.get("识别完成", False):
             st.subheader("📊 AI识别结果")
             
             # 模拟识别结果
             disaster_types = ['洪涝', '干旱', '病虫害', '台风', '冰雹']
-            probabilities = np.random.dirichlet(np.ones(5)) * 100
+            
+            # 使用固定的随机种子保证结果一致性
+            if 'disaster_result' not in st.session_state:
+                np.random.seed(42)
+                st.session_state.disaster_result = {
+                    'probabilities': np.random.dirichlet(np.ones(5)) * 100,
+                    'damage_level': np.random.randint(30, 90)
+                }
+            
+            probabilities = st.session_state.disaster_result['probabilities']
+            damage_level = st.session_state.disaster_result['damage_level']
             
             # 主要灾害类型
             main_disaster = disaster_types[np.argmax(probabilities)]
@@ -88,7 +99,6 @@ with tab1:
             st.metric("置信度", f"{main_prob:.1f}%")
             
             # 受损程度评估
-            damage_level = np.random.randint(30, 90)
             st.metric("受损程度", f"{damage_level}%")
             
             st.divider()
@@ -111,7 +121,8 @@ with tab1:
             fig_prob.update_layout(
                 xaxis_title="概率(%)",
                 yaxis_title="",
-                height=300
+                height=300,
+                margin=dict(l=0, r=0, t=10, b=0)
             )
             
             st.plotly_chart(fig_prob, use_container_width=True)
@@ -120,7 +131,7 @@ with tab1:
             st.divider()
             st.markdown("**💰 建议理赔金额计算**")
             
-            area = st.slider("受灾面积(亩)", 1, 50, 10)
+            area = st.slider("受灾面积(亩)", 1, 50, 10, key="受灾面积")
             unit_amount = 5000  # 每亩保额
             
             suggested_amount = area * unit_amount * (damage_level / 100)
@@ -172,18 +183,21 @@ with tab2:
     with col1:
         st.subheader("⚙️ 预测参数设置")
         
-        crop = st.selectbox("选择作物", ['沃柑', '甘蔗', '荔枝', '芒果'])
-        forecast_days = st.slider("预测天数", 7, 90, 30)
+        crop = st.selectbox("选择作物", ['沃柑', '甘蔗', '荔枝', '芒果'], key="作物选择")
+        forecast_days = st.slider("预测天数", 7, 90, 30, key="预测天数")
         
         st.divider()
         
         st.markdown("**影响因素设置**")
         
-        weather_factor = st.slider("天气影响系数", 0.0, 1.0, 0.5, 0.1)
-        supply_factor = st.slider("供需影响系数", 0.0, 1.0, 0.7, 0.1)
-        policy_factor = st.slider("政策影响系数", 0.0, 1.0, 0.3, 0.1)
+        weather_factor = st.slider("天气影响系数", 0.0, 1.0, 0.5, 0.1, key="天气系数",
+                                   help="0=天气良好(价格可能上涨), 1=天气恶劣(价格可能下跌)")
+        supply_factor = st.slider("供需影响系数", 0.0, 1.0, 0.7, 0.1, key="供需系数",
+                                  help="0=供过于求(价格下跌), 1=供不应求(价格上涨)")
+        policy_factor = st.slider("政策影响系数", 0.0, 1.0, 0.3, 0.1, key="政策系数",
+                                  help="0=政策不利(价格下跌), 1=政策利好(价格上涨)")
         
-        if st.button("🚀 开始预测", type="primary", use_container_width=True):
+        if st.button("🚀 开始预测", type="primary", use_container_width=True, key="预测按钮"):
             st.session_state.predict_done = True
             st.session_state.weather_factor = weather_factor
             st.session_state.supply_factor = supply_factor
@@ -199,6 +213,7 @@ with tab2:
         dates = pd.date_range(end=datetime.now(), periods=historical_days, freq='D')
         
         # 模拟历史价格(带季节性)
+        np.random.seed(123)  # 固定随机种子
         t = np.arange(historical_days)
         seasonal = 0.5 * np.sin(2 * np.pi * t / 365)
         trend = -0.002 * t
@@ -206,7 +221,7 @@ with tab2:
         historical_prices = 3.0 + seasonal + trend + noise
         
         # 生成预测价格
-        if 'predict_done' in st.session_state and st.session_state.predict_done:
+        if st.session_state.get('predict_done', False):
             
             with st.spinner("AI模型预测中..."):
                 time.sleep(1.5)
@@ -229,7 +244,7 @@ with tab2:
             seasonal_future = 0.5 * np.sin(2 * np.pi * (historical_days + t_future) / 365)
             trend_future = -0.002 * (historical_days + t_future)
             
-            # 加入影响因子 - 修正计算逻辑
+            # 加入影响因子
             # 天气因素：0=利好(价格上涨), 1=不利(价格下跌)
             weather_impact = (weather_factor_used - 0.5) * (-0.5)
             # 供需因素：0=供大于求(价格下跌), 1=供不应求(价格上涨)
@@ -241,6 +256,7 @@ with tab2:
             total_impact = weather_impact + supply_impact + policy_impact
             
             # 生成预测价格（考虑影响因素）
+            np.random.seed(456)
             noise_future = np.random.normal(0, 0.15, forecast_days_used)
             predicted_prices = 3.0 + seasonal_future + trend_future + total_impact + noise_future
             
@@ -338,3 +354,295 @@ with tab2:
         - 政策因子(补贴、进出口政策)
         
         **2. 网络结构**
+```
+        Input Layer (多变量时间序列)
+            ↓
+        LSTM Layer 1 (128 units, return_sequences=True)
+            ↓
+        Dropout (0.2)
+            ↓
+        LSTM Layer 2 (64 units)
+            ↓
+        Dropout (0.2)
+            ↓
+        Dense Layer (32 units, ReLU)
+            ↓
+        Output Layer (1 unit, Linear)
+```
+        
+        **3. 训练参数**
+        - 损失函数: MSE (均方误差)
+        - 优化器: Adam (learning_rate=0.001)
+        - Batch Size: 32
+        - Epochs: 100
+        
+        **4. 性能指标**
+        - MAE (平均绝对误差): ¥0.15/斤
+        - RMSE (均方根误差): ¥0.21/斤
+        - R² Score: 0.87
+        """)
+
+# ==================== Tab3: 自动化理赔流程 ====================
+with tab3:
+    st.header("⚡ 自动化理赔流程演示")
+    
+    st.markdown("""
+    展示从理赔申请到赔付到账的全自动化流程,突出AI技术在各环节的作用。
+    """)
+    
+    if st.button("▶️ 播放演示动画", type="primary", key="播放动画"):
+        
+        steps = [
+            ("📝 农户提交理赔申请", "农户通过手机APP上传受灾照片和相关信息"),
+            ("🤖 AI图像识别", "深度学习模型自动识别灾害类型和受损程度"),
+            ("🔍 多维数据交叉验证", "系统自动调取气象数据、遥感影像、市场价格进行验证"),
+            ("✅ 智能审核决策", "AI综合分析,给出审核建议和理赔金额"),
+            ("📋 人工复核(可选)", "对于高风险案件,保险公司进行人工复核"),
+            ("💰 自动赔付", "通过智能合约自动触发赔付,资金直达农户账户"),
+            ("✅ 理赔完成", "农户收到赔付款和电子理赔单")
+        ]
+        
+        progress_container = st.empty()
+        
+        for i, (title, desc) in enumerate(steps):
+            progress = (i + 1) / len(steps)
+            
+            with progress_container.container():
+                st.progress(progress)
+                st.success(f"### {title}")
+                st.info(desc)
+                
+                # 显示时间节点
+                if i == 0:
+                    st.caption("⏱️ T+0分钟")
+                elif i < 4:
+                    st.caption(f"⏱️ T+{i*2}分钟")
+                elif i == 4:
+                    st.caption("⏱️ T+30分钟(如需人工)")
+                else:
+                    st.caption("⏱️ T+1小时")
+            
+            time.sleep(1.5)
+        
+        st.balloons()
+        st.success("🎉 理赔流程演示完成!")
+    
+    st.divider()
+    
+    # 对比传统流程
+    st.subheader("📊 传统流程 vs AI流程对比")
+    
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.markdown("### 传统理赔流程")
+        st.error("""
+        **⏱️ 平均耗时: 7-15天**
+        
+        1. 📝 农户电话/线下申请 (1天)
+        2. 👨‍💼 查勘员实地勘查 (2-3天)
+        3. 📋 人工资料审核 (3-5天)
+        4. ✍️ 多级审批流程 (2-3天)
+        5. 💰 财务转账赔付 (1-2天)
+        
+        **痛点:**
+        - ❌ 效率低下
+        - ❌ 人工成本高
+        - ❌ 容易出错
+        - ❌ 透明度不足
+        """)
+    
+    with col2:
+        st.markdown("### AI智能理赔流程")
+        st.success("""
+        **⚡ 平均耗时: 1小时**
+        
+        1. 📱 在线提交申请 (即时)
+        2. 🤖 AI自动识别 (2分钟)
+        3. 🔍 数据交叉验证 (5分钟)
+        4. ✅ 智能审核决策 (3分钟)
+        5. 💰 自动化赔付 (即时)
+        
+        **优势:**
+        - ✅ 效率提升**95%**
+        - ✅ 成本降低**70%**
+        - ✅ 准确率**92%+**
+        - ✅ 全程可追溯
+        """)
+    
+    st.divider()
+    
+    # 关键技术
+    st.subheader("🔑 关键技术栈")
+    
+    col1, col2, col3 = st.columns(3)
+    
+    with col1:
+        st.markdown("""
+        **🤖 AI技术**
+        - 计算机视觉(CV)
+        - 自然语言处理(NLP)
+        - 时间序列预测
+        - 强化学习
+        """)
+    
+    with col2:
+        st.markdown("""
+        **🔗 区块链技术**
+        - 智能合约
+        - 分布式账本
+        - 数据溯源
+        - 防篡改机制
+        """)
+    
+    with col3:
+        st.markdown("""
+        **☁️ 云计算**
+        - 微服务架构
+        - API网关
+        - 实时数据流
+        - 自动扩展
+        """)
+
+# ==================== Tab4: 技术架构 ====================
+with tab4:
+    st.header("📊 系统技术架构")
+    
+    st.markdown("""
+    ### 🏗️ 整体架构图
+    
+    智控农险系统采用**微服务架构**,结合AI、区块链、大数据等技术,构建全链条智能风控平台。
+    """)
+    
+    # 架构图(用Mermaid绘制)
+    st.markdown("""
+```mermaid
+    graph TB
+        A[农户端 Mobile/Web] --> B[API网关]
+        C[保险公司端 Web] --> B
+        
+        B --> D[微服务层]
+        
+        D --> E[用户服务]
+        D --> F[保单服务]
+        D --> G[理赔服务]
+        D --> H[AI服务]
+        
+        H --> I[图像识别模型]
+        H --> J[价格预测模型]
+        H --> K[风险评估模型]
+        
+        G --> L[区块链层]
+        L --> M[智能合约]
+        L --> N[分布式账本]
+        
+        E --> O[数据库层]
+        F --> O
+        G --> O
+        
+        O --> P[MySQL 用户数据]
+        O --> Q[MongoDB 文档数据]
+        O --> R[Redis 缓存]
+        
+        H --> S[大数据平台]
+        S --> T[气象数据]
+        S --> U[遥感数据]
+        S --> V[市场数据]
+```
+    """)
+    
+    st.divider()
+    
+    # 技术选型
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        st.subheader("💻 前端技术栈")
+        st.code("""
+        - Framework: Streamlit / React
+        - UI Library: Ant Design / MUI
+        - Charts: Plotly / ECharts
+        - Maps: Mapbox / Leaflet
+        - State: Redux / Zustand
+        """, language="text")
+        
+        st.subheader("🔧 后端技术栈")
+        st.code("""
+        - Language: Python / Go
+        - Framework: FastAPI / Gin
+        - ORM: SQLAlchemy / GORM
+        - Message Queue: RabbitMQ / Kafka
+        - Cache: Redis
+        """, language="text")
+    
+    with col2:
+        st.subheader("🤖 AI/ML技术栈")
+        st.code("""
+        - Deep Learning: PyTorch / TensorFlow
+        - CV: OpenCV / Pillow
+        - NLP: Transformers / spaCy
+        - Time Series: Prophet / LSTM
+        - Deployment: TorchServe / ONNX
+        """, language="text")
+        
+        st.subheader("☁️ DevOps技术栈")
+        st.code("""
+        - Container: Docker / Kubernetes
+        - CI/CD: GitHub Actions / Jenkins
+        - Monitoring: Prometheus / Grafana
+        - Logging: ELK Stack
+        - Cloud: AWS / Aliyun
+        """, language="text")
+    
+    st.divider()
+    
+    # 数据流图
+    st.subheader("📈 数据流向图")
+    
+    st.markdown("""
+```mermaid
+    sequenceDiagram
+        participant 农户
+        participant APP
+        participant API
+        participant AI模型
+        participant 区块链
+        participant 数据库
+        
+        农户->>APP: 1. 提交理赔申请
+        APP->>API: 2. 上传数据
+        API->>AI模型: 3. 请求AI识别
+        AI模型->>API: 4. 返回识别结果
+        API->>数据库: 5. 保存理赔记录
+        API->>区块链: 6. 上链存证
+        区块链->>API: 7. 返回交易哈希
+        API->>APP: 8. 返回审核结果
+        APP->>农户: 9. 显示理赔状态
+```
+    """)
+    
+    st.divider()
+    
+    # 性能指标
+    st.subheader("⚡ 性能指标")
+    
+    col1, col2, col3, col4 = st.columns(4)
+    
+    with col1:
+        st.metric("API响应时间", "< 100ms", "99th percentile")
+    
+    with col2:
+        st.metric("AI识别速度", "< 2s", "单张图片")
+    
+    with col3:
+        st.metric("系统可用性", "99.9%", "SLA")
+    
+    with col4:
+        st.metric("并发处理", "10,000+", "QPS")
+
+# 页脚
+st.divider()
+st.info("""
+💡 **技术支持:** 本系统基于最新的AI技术和金融科技实践,持续迭代优化中。
+如有技术合作或咨询需求,欢迎联系我们!
+""")
