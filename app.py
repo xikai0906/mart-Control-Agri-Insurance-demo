@@ -32,6 +32,20 @@ st.markdown("""
         border-radius: 10px;
         border-left: 5px solid #66BB6A;
         margin: 1rem 0;
+        min-height: 180px;
+        display: flex;
+        flex-direction: column;
+    }
+    .feature-box h3 {
+        margin-top: 0;
+        margin-bottom: 1rem;
+        color: #2E7D32;
+    }
+    .feature-box p {
+        flex-grow: 1;
+        margin: 0;
+        color: #555;
+        line-height: 1.6;
     }
     </style>
 """, unsafe_allow_html=True)
