@@ -7,6 +7,12 @@ import time
 
 st.set_page_config(page_title="AI技术演示", page_icon="🤖", layout="wide")
 
+# 顶部导航
+col_nav1, col_nav2 = st.columns([1, 4])
+with col_nav1:
+    if st.button("🏠 返回首页", use_container_width=True):
+        st.switch_page("app.py")
+
 st.title("🤖 AI技术演示中心")
 st.markdown("---")
 
@@ -211,11 +217,20 @@ with tab2:
             seasonal_future = 0.5 * np.sin(2 * np.pi * (historical_days + t_future) / 365)
             trend_future = -0.002 * (historical_days + t_future)
             
-            # 加入影响因子
-            impact = (weather_factor + supply_factor + policy_factor) / 3
-            noise_future = np.random.normal(0, 0.15, forecast_days) * impact
+            # 加入影响因子 - 修正计算逻辑
+            # 天气因素：0=利好(价格上涨), 1=不利(价格下跌)
+            weather_impact = (weather_factor - 0.5) * (-0.5)  # 转换为价格影响
+            # 供需因素：0=供大于求(价格下跌), 1=供不应求(价格上涨)
+            supply_impact = (supply_factor - 0.5) * 0.8
+            # 政策因素：0=不利(价格下跌), 1=利好(价格上涨)
+            policy_impact = (policy_factor - 0.5) * 0.3
             
-            predicted_prices = 3.0 + seasonal_future + trend_future + noise_future
+            # 综合影响
+            total_impact = weather_impact + supply_impact + policy_impact
+            
+            # 生成预测价格（考虑影响因素）
+            noise_future = np.random.normal(0, 0.15, forecast_days)
+            predicted_prices = 3.0 + seasonal_future + trend_future + total_impact + noise_future
             
             # 置信区间
             confidence_upper = predicted_prices + 0.3
