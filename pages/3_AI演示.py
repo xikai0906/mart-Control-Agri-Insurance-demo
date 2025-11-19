@@ -11,7 +11,7 @@ st.set_page_config(page_title="AI技术演示", page_icon="🤖", layout="wide")
 col_nav1, col_nav2 = st.columns([1, 4])
 with col_nav1:
     if st.button("🏠 返回首页", use_container_width=True):
-        st.switch_page("app.py")  
+        st.switch_page("app.py")
 
 st.title("🤖 AI技术演示中心")
 st.markdown("---")
@@ -189,13 +189,28 @@ with tab2:
         st.divider()
         
         st.markdown("**影响因素设置**")
+        st.caption("💡 提示: 调整系数越高，对价格的影响越大")
         
-        weather_factor = st.slider("天气影响系数", 0.0, 1.0, 0.5, 0.1, key="天气系数",
-                                   help="0=天气良好(价格可能上涨), 1=天气恶劣(价格可能下跌)")
-        supply_factor = st.slider("供需影响系数", 0.0, 1.0, 0.7, 0.1, key="供需系数",
-                                  help="0=供过于求(价格下跌), 1=供不应求(价格上涨)")
-        policy_factor = st.slider("政策影响系数", 0.0, 1.0, 0.3, 0.1, key="政策系数",
-                                  help="0=政策不利(价格下跌), 1=政策利好(价格上涨)")
+        weather_factor = st.slider(
+            "天气影响系数", 
+            0.0, 1.0, 0.5, 0.1, 
+            key="天气系数",
+            help="0=天气良好(利于生产,供应增加,价格可能下降)\n1=天气恶劣(影响生产,供应减少,价格可能上涨)"
+        )
+        
+        supply_factor = st.slider(
+            "供需影响系数", 
+            0.0, 1.0, 0.5, 0.1, 
+            key="供需系数",
+            help="0=供过于求(价格下跌)\n1=供不应求(价格上涨)"
+        )
+        
+        policy_factor = st.slider(
+            "政策影响系数", 
+            0.0, 1.0, 0.5, 0.1, 
+            key="政策系数",
+            help="0=政策不利(如减少补贴,价格下跌)\n1=政策利好(如增加补贴,价格上涨)"
+        )
         
         if st.button("🚀 开始预测", type="primary", use_container_width=True, key="预测按钮"):
             st.session_state.predict_done = True
@@ -212,13 +227,13 @@ with tab2:
         historical_days = 180
         dates = pd.date_range(end=datetime.now(), periods=historical_days, freq='D')
         
-        # 模拟历史价格(带季节性)
-        np.random.seed(123)  # 固定随机种子
+        # 模拟历史价格(带季节性) - 提高基准价格到3.5
+        np.random.seed(123)
         t = np.arange(historical_days)
-        seasonal = 0.5 * np.sin(2 * np.pi * t / 365)
-        trend = -0.002 * t
-        noise = np.random.normal(0, 0.1, historical_days)
-        historical_prices = 3.0 + seasonal + trend + noise
+        seasonal = 0.3 * np.sin(2 * np.pi * t / 365)  # 季节性波动
+        trend = -0.001 * t  # 轻微下降趋势
+        noise = np.random.normal(0, 0.08, historical_days)  # 随机噪声
+        historical_prices = 3.5 + seasonal + trend + noise  # 基准价提高到3.5
         
         # 生成预测价格
         if st.session_state.get('predict_done', False):
@@ -241,28 +256,30 @@ with tab2:
             
             # 考虑影响因素的预测
             t_future = np.arange(forecast_days_used)
-            seasonal_future = 0.5 * np.sin(2 * np.pi * (historical_days + t_future) / 365)
-            trend_future = -0.002 * (historical_days + t_future)
+            seasonal_future = 0.3 * np.sin(2 * np.pi * (historical_days + t_future) / 365)
+            trend_future = -0.001 * (historical_days + t_future)
             
-            # 加入影响因子
-            # 天气因素：0=利好(价格上涨), 1=不利(价格下跌)
-            weather_impact = (weather_factor_used - 0.5) * (-0.5)
-            # 供需因素：0=供大于求(价格下跌), 1=供不应求(价格上涨)
-            supply_impact = (supply_factor_used - 0.5) * 0.8
-            # 政策因素：0=不利(价格下跌), 1=利好(价格上涨)
-            policy_impact = (policy_factor_used - 0.5) * 0.3
+            # 修正影响因子计算 - 让影响更明显
+            # 天气因素：0=良好(价格下降), 0.5=正常, 1=恶劣(价格上升)
+            weather_impact = (weather_factor_used - 0.5) * 1.2
+            
+            # 供需因素：0=供过于求(价格下降), 0.5=平衡, 1=供不应求(价格上升)
+            supply_impact = (supply_factor_used - 0.5) * 1.5
+            
+            # 政策因素：0=不利(价格下降), 0.5=中性, 1=利好(价格上升)
+            policy_impact = (policy_factor_used - 0.5) * 0.8
             
             # 综合影响
             total_impact = weather_impact + supply_impact + policy_impact
             
             # 生成预测价格（考虑影响因素）
             np.random.seed(456)
-            noise_future = np.random.normal(0, 0.15, forecast_days_used)
-            predicted_prices = 3.0 + seasonal_future + trend_future + total_impact + noise_future
+            noise_future = np.random.normal(0, 0.12, forecast_days_used)
+            predicted_prices = 3.5 + seasonal_future + trend_future + total_impact + noise_future
             
             # 置信区间
-            confidence_upper = predicted_prices + 0.3
-            confidence_lower = predicted_prices - 0.3
+            confidence_upper = predicted_prices + 0.35
+            confidence_lower = predicted_prices - 0.35
             
             # 绘制价格走势
             fig_forecast = go.Figure()
@@ -301,7 +318,8 @@ with tab2:
                 y=3.0,
                 line_dash="dot",
                 annotation_text="保险阈值: ¥3.0/斤",
-                line_color="orange"
+                line_color="orange",
+                annotation_position="right"
             )
             
             fig_forecast.update_layout(
@@ -309,7 +327,8 @@ with tab2:
                 xaxis_title="日期",
                 yaxis_title="价格(元/斤)",
                 hovermode='x unified',
-                height=500
+                height=500,
+                yaxis=dict(range=[1.5, 4.5])  # 固定Y轴范围
             )
             
             st.plotly_chart(fig_forecast, use_container_width=True)
@@ -337,6 +356,21 @@ with tab2:
                 st.warning(f"⚠️ **注意:** 预测期内有{trigger_prob:.0f}%的时间价格低于保险阈值")
             else:
                 st.success("✅ 价格预测良好,理赔风险较低")
+            
+            # 参数影响说明
+            st.divider()
+            with st.expander("📊 当前参数对价格的影响分析"):
+                st.markdown(f"""
+                **影响因子综合分析:**
+                
+                - **天气系数 {weather_factor_used:.1f}**: {'恶劣天气推高价格 📈' if weather_factor_used > 0.5 else '良好天气压低价格 📉' if weather_factor_used < 0.5 else '天气正常 ➡️'}
+                - **供需系数 {supply_factor_used:.1f}**: {'供不应求推高价格 📈' if supply_factor_used > 0.5 else '供过于求压低价格 📉' if supply_factor_used < 0.5 else '供需平衡 ➡️'}
+                - **政策系数 {policy_factor_used:.1f}**: {'政策利好推高价格 📈' if policy_factor_used > 0.5 else '政策不利压低价格 📉' if policy_factor_used < 0.5 else '政策中性 ➡️'}
+                
+                **综合影响值:** {total_impact:+.2f} 元/斤
+                
+                💡 **建议:** {'将天气或供需系数调低可降低理赔风险' if trigger_prob > 50 else '将供需系数调高可进一步降低风险' if trigger_prob > 20 else '当前参数设置合理'}
+                """)
         else:
             st.info("👈 请在左侧设置预测参数，然后点击「开始预测」按钮")
     
