@@ -8,6 +8,12 @@ from datetime import datetime, timedelta
 
 st.set_page_config(page_title="量化模型后台", page_icon="📊", layout="wide")
 
+# 顶部导航
+col_nav1, col_nav2 = st.columns([1, 4])
+with col_nav1:
+    if st.button("🏠 返回首页", use_container_width=True):
+        st.switch_page("app.py")
+
 st.title("📊 量化模型后台 - 金融工程与精算分析")
 st.markdown("---")
 
@@ -26,7 +32,7 @@ with tab1:
     st.markdown("""
     ### 模型说明
     
-    亚式看跌期权（Asian Put Option）是一种路径依赖型期权，其收益取决于标的资产在一段时间内的平均价格，
+    **亚式看跌期权（Asian Put Option）**是一种路径依赖型期权，其收益取决于标的资产在一段时间内的平均价格，
     而非到期时的即时价格。相比欧式期权，亚式期权能更好地平滑价格波动，降低被操纵风险。
     
     **"保险+亚式看跌期权"结构：**
@@ -48,9 +54,9 @@ with tab1:
         T = st.slider("保险期限 T (月)", min_value=1, max_value=12, value=6)
     
     with col2:
-        sigma = st.slider("价格波动率 σ", min_value=0.1, max_value=0.8, value=0.25, step=0.05,key="sigma_volatility")
-        r = st.slider("无风险利率 r", min_value=0.01, max_value=0.10, value=0.03, step=0.01,key="risk_free_rate")
-        Q = st.number_input("承保数量 Q (吨)", min_value=1, max_value=1000, value=100, step=10,key="quantity_insured")
+        sigma = st.slider("价格波动率 σ", min_value=0.1, max_value=0.8, value=0.25, step=0.05, key="sigma_volatility")
+        r = st.slider("无风险利率 r", min_value=0.01, max_value=0.10, value=0.03, step=0.01, key="risk_free_rate")
+        Q = st.number_input("承保数量 Q (吨)", min_value=1, max_value=1000, value=100, step=10, key="quantity_insured")
     
     with col3:
         premium_rate = st.slider("保费率 (%)", min_value=1.0, max_value=20.0, value=8.0, step=0.5)
@@ -346,10 +352,10 @@ with tab2:
     with col1:
         st.subheader("⚙️ 定价参数")
         
-        S_base = st.number_input("现货价格 S₀", min_value=1.0, value=3.0, step=0.1,key="spot_price_base")
-        K_base = st.number_input("执行价格 K", min_value=1.0, value=3.0, step=0.1,key="strike_price_base")
-        T_base = st.slider("到期时间 T (年)", 0.1, 2.0, 0.5, 0.1,key="time_to_maturity_base")
-        r_base = st.slider("无风险利率 r", 0.01, 0.10, 0.03, 0.01,key="risk_free_rate_base")
+        S_base = st.number_input("现货价格 S₀", min_value=1.0, value=3.0, step=0.1, key="spot_price_base")
+        K_base = st.number_input("执行价格 K", min_value=1.0, value=3.0, step=0.1, key="strike_price_base")
+        T_base = st.slider("到期时间 T (年)", 0.1, 2.0, 0.5, 0.1, key="time_to_maturity_base")
+        r_base = st.slider("无风险利率 r", 0.01, 0.10, 0.03, 0.01, key="risk_free_rate_base")
         
         st.divider()
         
@@ -587,7 +593,7 @@ with tab3:
         has_history = st.checkbox("是否有历史投保记录", value=True)
         
         if has_history:
-            claim_history = st.slider("过去3年理赔次数", 0, 10, 2,key="claim_history_count")
+            claim_history = st.slider("过去3年理赔次数", 0, 10, 2, key="claim_history_count")
         else:
             claim_history = 0
         
