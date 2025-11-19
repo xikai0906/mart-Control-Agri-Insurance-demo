@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import plotly.express as px
 from datetime import datetime, timedelta
 
-st.set_page_config(page_title="保险公司端", page_icon="🏢", layout="wide")
+st.set_page_config(page_title="保险公司使用入口", page_icon="🏢", layout="wide")
 # 顶部导航
 col_nav1, col_nav2 = st.columns([1, 4])
 with col_nav1:
