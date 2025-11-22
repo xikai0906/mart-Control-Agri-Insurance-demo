@@ -68,13 +68,18 @@ with tab1:
     
     st.divider()
     
-    # 模拟价格路径
-    st.subheader("📈 价格路径模拟（蒙特卡洛）")
-    
-    n_simulations = st.slider("模拟路径数量", 100, 1000, 500, 100)
-    n_steps = T * 30  # 每月30天
-    
-    # 生成价格路径
+   # 模拟价格路径
+st.subheader("📈 价格路径模拟（蒙特卡洛）")
+
+n_simulations = st.slider("模拟路径数量", 1000, 50000, 10000, 1000)
+
+if n_simulations >= 20000:
+    st.warning("⚠️ 路径数量较大，计算可能需要几秒钟，请耐心等待...")
+
+n_steps = T * 30  # 每月30天
+
+# 生成价格路径
+with st.spinner(f"正在生成 {n_simulations:,} 条价格路径..."):
     dt = T / n_steps
     paths = np.zeros((n_simulations, n_steps + 1))
     paths[:, 0] = S0
@@ -82,49 +87,68 @@ with tab1:
     for t in range(1, n_steps + 1):
         z = np.random.standard_normal(n_simulations)
         paths[:, t] = paths[:, t-1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
-    
-    # 计算亚式平均价格
-    asian_prices = paths.mean(axis=1)
-    
-    # 绘制部分路径
-    fig_paths = go.Figure()
-    
-    # 显示前50条路径
-    for i in range(min(50, n_simulations)):
-        fig_paths.add_trace(go.Scatter(
-            x=np.arange(n_steps + 1),
-            y=paths[i],
-            mode='lines',
-            line=dict(width=0.5),
-            opacity=0.3,
-            showlegend=False,
-            hoverinfo='skip'
-        ))
-    
-    # 添加平均路径
-    avg_path = paths.mean(axis=0)
+
+# 计算亚式平均价格
+asian_prices = paths.mean(axis=1)
+
+# 绘制部分路径
+fig_paths = go.Figure()
+
+# 根据模拟数量动态调整显示路径数
+display_paths = min(100, n_simulations)
+
+# 随机选择要显示的路径
+if n_simulations > display_paths:
+    display_indices = np.random.choice(n_simulations, display_paths, replace=False)
+else:
+    display_indices = range(n_simulations)
+
+for i in display_indices:
     fig_paths.add_trace(go.Scatter(
         x=np.arange(n_steps + 1),
-        y=avg_path,
+        y=paths[i],
         mode='lines',
-        name='平均路径',
-        line=dict(color='red', width=3)
+        line=dict(width=0.5),
+        opacity=0.2,
+        showlegend=False,
+        hoverinfo='skip'
     ))
-    
-    # 添加保险价格线
-    fig_paths.add_hline(y=K, line_dash="dash", line_color="orange",
-                       annotation_text=f"保险价格 K={K}")
-    
-    fig_paths.update_layout(
-        title=f"价格路径模拟 (n={n_simulations}条)",
-        xaxis_title="时间步",
-        yaxis_title="价格(元/斤)",
-        height=500
-    )
-    
-    st.plotly_chart(fig_paths, use_container_width=True)
-    
-    st.divider()
+
+# 添加平均路径
+avg_path = paths.mean(axis=0)
+fig_paths.add_trace(go.Scatter(
+    x=np.arange(n_steps + 1),
+    y=avg_path,
+    mode='lines',
+    name='平均路径',
+    line=dict(color='red', width=3)
+))
+
+# 添加保险价格线
+fig_paths.add_hline(y=K, line_dash="dash", line_color="orange",
+                   annotation_text=f"保险价格 K={K}")
+
+fig_paths.update_layout(
+    title=f"价格路径模拟 (总计 {n_simulations:,} 条，显示 {len(display_indices)} 条)",
+    xaxis_title="时间步",
+    yaxis_title="价格(元/斤)",
+    height=500
+)
+
+st.plotly_chart(fig_paths, use_container_width=True)
+
+# 显示统计信息
+col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
+with col_stat1:
+    st.metric("模拟路径数", f"{n_simulations:,}")
+with col_stat2:
+    st.metric("平均终值价格", f"¥{paths[:, -1].mean():.3f}")
+with col_stat3:
+    st.metric("价格标准差", f"¥{paths[:, -1].std():.3f}")
+with col_stat4:
+    st.metric("平均亚式价格", f"¥{asian_prices.mean():.3f}")
+
+st.divider()
     
     # 损益分析
     st.subheader("💸 损益分析")
