@@ -32,11 +32,11 @@ with tab1:
     st.markdown("""
     ### 模型说明
     
-    亚式看跌期权（Asian Put Option）是一种路径依赖型期权，其收益取决于标的资产在一段时间内的平均价格，
-    而非到期时的即时价格。相比欧式期权，亚式期权能更好地平滑价格波动，降低被操纵风险。
+    亚式看跌期权(Asian Put Option)是一种路径依赖型期权,其收益取决于标的资产在一段时间内的平均价格,
+    而非到期时的即时价格。相比欧式期权,亚式期权能更好地平滑价格波动,降低被操纵风险。
     
-    **"保险+亚式看跌期权"结构：**
-    1. 农户向保险公司购买价格保险（保障最低收购价 K）
+    **"保险+亚式看跌期权"结构:**
+    1. 农户向保险公司购买价格保险(保障最低收购价 K)
     2. 保险公司向风险管理公司买入亚式看跌期权对冲风险
     3. 风险管理公司在期货市场进行动态对冲
     """)
@@ -68,87 +68,87 @@ with tab1:
     
     st.divider()
     
-   # 模拟价格路径
-st.subheader("📈 价格路径模拟（蒙特卡洛）")
-
-n_simulations = st.slider("模拟路径数量", 1000, 50000, 10000, 1000)
-
-if n_simulations >= 20000:
-    st.warning("⚠️ 路径数量较大，计算可能需要几秒钟，请耐心等待...")
-
-n_steps = T * 30  # 每月30天
-
-# 生成价格路径
-with st.spinner(f"正在生成 {n_simulations:,} 条价格路径..."):
-    dt = T / n_steps
-    paths = np.zeros((n_simulations, n_steps + 1))
-    paths[:, 0] = S0
+    # 模拟价格路径
+    st.subheader("📈 价格路径模拟(蒙特卡洛)")
     
-    for t in range(1, n_steps + 1):
-        z = np.random.standard_normal(n_simulations)
-        paths[:, t] = paths[:, t-1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
-
-# 计算亚式平均价格
-asian_prices = paths.mean(axis=1)
-
-# 绘制部分路径
-fig_paths = go.Figure()
-
-# 根据模拟数量动态调整显示路径数
-display_paths = min(100, n_simulations)
-
-# 随机选择要显示的路径
-if n_simulations > display_paths:
-    display_indices = np.random.choice(n_simulations, display_paths, replace=False)
-else:
-    display_indices = range(n_simulations)
-
-for i in display_indices:
+    n_simulations = st.slider("模拟路径数量", 1000, 50000, 10000, 1000)
+    
+    if n_simulations >= 20000:
+        st.warning("⚠️ 路径数量较大,计算可能需要几秒钟,请耐心等待...")
+    
+    n_steps = T * 30  # 每月30天
+    
+    # 生成价格路径
+    with st.spinner(f"正在生成 {n_simulations:,} 条价格路径..."):
+        dt = T / n_steps
+        paths = np.zeros((n_simulations, n_steps + 1))
+        paths[:, 0] = S0
+        
+        for t in range(1, n_steps + 1):
+            z = np.random.standard_normal(n_simulations)
+            paths[:, t] = paths[:, t-1] * np.exp((r - 0.5 * sigma**2) * dt + sigma * np.sqrt(dt) * z)
+    
+    # 计算亚式平均价格
+    asian_prices = paths.mean(axis=1)
+    
+    # 绘制部分路径
+    fig_paths = go.Figure()
+    
+    # 根据模拟数量动态调整显示路径数
+    display_paths = min(100, n_simulations)
+    
+    # 随机选择要显示的路径
+    if n_simulations > display_paths:
+        display_indices = np.random.choice(n_simulations, display_paths, replace=False)
+    else:
+        display_indices = range(n_simulations)
+    
+    for i in display_indices:
+        fig_paths.add_trace(go.Scatter(
+            x=np.arange(n_steps + 1),
+            y=paths[i],
+            mode='lines',
+            line=dict(width=0.5),
+            opacity=0.2,
+            showlegend=False,
+            hoverinfo='skip'
+        ))
+    
+    # 添加平均路径
+    avg_path = paths.mean(axis=0)
     fig_paths.add_trace(go.Scatter(
         x=np.arange(n_steps + 1),
-        y=paths[i],
+        y=avg_path,
         mode='lines',
-        line=dict(width=0.5),
-        opacity=0.2,
-        showlegend=False,
-        hoverinfo='skip'
+        name='平均路径',
+        line=dict(color='red', width=3)
     ))
-
-# 添加平均路径
-avg_path = paths.mean(axis=0)
-fig_paths.add_trace(go.Scatter(
-    x=np.arange(n_steps + 1),
-    y=avg_path,
-    mode='lines',
-    name='平均路径',
-    line=dict(color='red', width=3)
-))
-
-# 添加保险价格线
-fig_paths.add_hline(y=K, line_dash="dash", line_color="orange",
-                   annotation_text=f"保险价格 K={K}")
-
-fig_paths.update_layout(
-    title=f"价格路径模拟 (总计 {n_simulations:,} 条，显示 {len(display_indices)} 条)",
-    xaxis_title="时间步",
-    yaxis_title="价格(元/斤)",
-    height=500
-)
-
-st.plotly_chart(fig_paths, use_container_width=True)
-
-# 显示统计信息
-col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
-with col_stat1:
-    st.metric("模拟路径数", f"{n_simulations:,}")
-with col_stat2:
-    st.metric("平均终值价格", f"¥{paths[:, -1].mean():.3f}")
-with col_stat3:
-    st.metric("价格标准差", f"¥{paths[:, -1].std():.3f}")
-with col_stat4:
-    st.metric("平均亚式价格", f"¥{asian_prices.mean():.3f}")
-
-st.divider()
+    
+    # 添加保险价格线
+    fig_paths.add_hline(y=K, line_dash="dash", line_color="orange",
+                       annotation_text=f"保险价格 K={K}")
+    
+    fig_paths.update_layout(
+        title=f"价格路径模拟 (总计 {n_simulations:,} 条,显示 {len(display_indices)} 条)",
+        xaxis_title="时间步",
+        yaxis_title="价格(元/斤)",
+        height=500
+    )
+    
+    st.plotly_chart(fig_paths, use_container_width=True)
+    
+    # 显示统计信息
+    col_stat1, col_stat2, col_stat3, col_stat4 = st.columns(4)
+    with col_stat1:
+        st.metric("模拟路径数", f"{n_simulations:,}")
+    with col_stat2:
+        st.metric("平均终值价格", f"¥{paths[:, -1].mean():.3f}")
+    with col_stat3:
+        st.metric("价格标准差", f"¥{paths[:, -1].std():.3f}")
+    with col_stat4:
+        st.metric("平均亚式价格", f"¥{asian_prices.mean():.3f}")
+    
+    st.divider()
     
     # 损益分析
     st.subheader("💸 损益分析")
@@ -165,15 +165,15 @@ st.divider()
         # 1. 期权费支出
         st.error(f"**期权费支出:** ¥{option_premium:,.2f}")
         
-        # 2. 赔付支出（对农户）
-        # 当市场平均价格 < K 时，保险公司需要赔付
+        # 2. 赔付支出(对农户)
+        # 当市场平均价格 < K 时,保险公司需要赔付
         insurance_payouts = np.maximum(K - asian_prices, 0) * Q * 1000
         avg_insurance_payout = insurance_payouts.mean()
         
         st.error(f"**预期赔付支出:** ¥{avg_insurance_payout:,.2f}")
         
-        # 3. 期权收入（从风险管理公司）
-        # 当市场平均价格 < K 时，看跌期权行权
+        # 3. 期权收入(从风险管理公司)
+        # 当市场平均价格 < K 时,看跌期权行权
         option_payoffs = np.maximum(K - asian_prices, 0) * Q * 1000
         avg_option_payoff = option_payoffs.mean()
         
@@ -197,14 +197,14 @@ st.divider()
         # 农户支出
         st.error(f"**保费支出:** ¥{insurance_premium:,.2f}")
         
-        # 农户收入（无保险情况）
+        # 农户收入(无保险情况)
         # 假设产量固定为 Q * 1000 公斤
         revenue_no_insurance = asian_prices * Q * 1000
         avg_revenue_no_insurance = revenue_no_insurance.mean()
         
         st.info(f"**无保险预期收入:** ¥{avg_revenue_no_insurance:,.2f}")
         
-        # 农户收入（有保险情况）
+        # 农户收入(有保险情况)
         # 收入 = max(市场价, 保险价) * 数量
         protected_prices = np.maximum(asian_prices, K)
         revenue_with_insurance = protected_prices * Q * 1000
@@ -215,10 +215,10 @@ st.divider()
         # 获得的保险赔付
         st.success(f"**预期获赔金额:** ¥{avg_insurance_payout:,.2f}")
         
-        # 农户净收益（扣除保费）
+        # 农户净收益(扣除保费)
         net_revenue = avg_revenue_with_insurance - insurance_premium
         
-        st.success(f"### 💰 **净收益（扣除保费）:** ¥{net_revenue:,.2f}")
+        st.success(f"### 💰 **净收益(扣除保费):** ¥{net_revenue:,.2f}")
         
         # 保险保障效果
         income_protection = ((avg_revenue_with_insurance - avg_revenue_no_insurance) / avg_revenue_no_insurance) * 100
@@ -301,7 +301,7 @@ st.divider()
     # 生成不同终值价格的损益
     final_prices = np.linspace(1.5, 4.5, 100)
     
-    # 农户损益（有保险 vs 无保险）
+    # 农户损益(有保险 vs 无保险)
     farmer_revenue_no_ins = final_prices * Q * 1000
     farmer_revenue_with_ins = np.maximum(final_prices, K) * Q * 1000 - insurance_premium
     
@@ -364,8 +364,8 @@ with tab2:
     st.markdown("""
     ### Black-Scholes-Merton 期权定价模型
     
-    亚式看跌期权的理论价格受多个因素影响，其中 **波动率(σ)** 是最关键的参数之一。
-    波动率越高，期权价值越大，因此保费也需要相应调整。
+    亚式看跌期权的理论价格受多个因素影响,其中 **波动率(σ)** 是最关键的参数之一。
+    波动率越高,期权价值越大,因此保费也需要相应调整。
     """)
     
     st.divider()
@@ -401,11 +401,11 @@ with tab2:
     with col2:
         st.subheader("📊 波动率对期权价格的影响")
         
-        # 计算不同波动率下的期权价格（简化的Black-Scholes公式）
+        # 计算不同波动率下的期权价格(简化的Black-Scholes公式)
         sigma_range = np.linspace(0.05, 0.80, 100)
         
         def asian_put_approx(S, K, T, r, sigma):
-            """亚式期权近似定价（Kemna-Vorst方法）"""
+            """亚式期权近似定价(Kemna-Vorst方法)"""
             # 调整参数
             sigma_adj = sigma / np.sqrt(3)
             b = 0.5 * (r - 0.5 * sigma**2)
@@ -476,7 +476,7 @@ with tab2:
     st.subheader("🔢 期权Greeks分析")
     
     st.markdown("""
-    **Greeks**是衡量期权价格对各种市场参数敏感度的指标：
+    **Greeks**是衡量期权价格对各种市场参数敏感度的指标:
     - **Delta (Δ)**: 对标的资产价格的敏感度
     - **Gamma (Γ)**: Delta的变化率
     - **Vega (ν)**: 对波动率的敏感度
@@ -591,7 +591,7 @@ with tab3:
     
     st.markdown("""
     ### 核保流程
-    智能核保系统通过AI技术自动评估投保风险，综合考虑：
+    智能核保系统通过AI技术自动评估投保风险,综合考虑:
     - 📍 地理位置风险
     - 🌦️ 历史气象数据
     - 📊 作物种植历史
@@ -688,7 +688,7 @@ with tab3:
             
             with col1:
                 st.metric("综合风险评分", f"{综合评分:.1f}分", 
-                         help="满分100分，分数越高风险越低")
+                         help="满分100分,分数越高风险越低")
                 
                 if 综合评分 >= 80:
                     risk_level = "🟢 低风险"
@@ -797,7 +797,7 @@ with tab4:
     
     st.markdown("""
     ### 理赔流程
-    通过AI图像识别、卫星遥感和区块链智能合约，实现全自动化理赔：
+    通过AI图像识别、卫星遥感和区块链智能合约,实现全自动化理赔:
     1. 📷 农户上传受灾照片
     2. 🤖 AI自动识别灾害类型和受损程度
     3. 🛰️ 卫星数据交叉验证
@@ -948,7 +948,7 @@ with tab4:
             st.subheader("⚡ 区块链智能合约触发")
             
             if verification_score >= 0.66:  # 至少2项验证通过
-                st.success("### 🎉 验证通过，触发智能合约自动理赔!")
+                st.success("### 🎉 验证通过,触发智能合约自动理赔!")
                 
                 # 计算赔付金额
                 unit_amount = 5000  # 每亩保额
@@ -1050,7 +1050,7 @@ Gas Used: 21000
                     """)
             
             else:
-                st.warning("### ⚠️ 验证未完全通过，需要人工复核")
+                st.warning("### ⚠️ 验证未完全通过,需要人工复核")
                 st.info("""
                 **处理建议:**
                 - 补充更多受灾照片
@@ -1066,5 +1066,5 @@ st.info("""
 - AI识别基于ResNet-50卷积神经网络
 - 卫星数据来自Sentinel-2遥感影像
 - 智能合约部署在以太坊测试网
-- 所有演示数据为模拟生成，仅供展示
+- 所有演示数据为模拟生成,仅供展示
 """)
