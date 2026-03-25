@@ -42,7 +42,7 @@ with col4:
 
 st.divider()
 
-# 顶部导航栏（已修复公益端跳转路径）
+# 顶部导航栏（公益端已改为 st.page_link，更稳定）
 st.markdown("### 🧭 快速导航")
 nav_col1, nav_col2, nav_col3, nav_col4, nav_col5 = st.columns(5)
 with nav_col1:
@@ -62,8 +62,12 @@ with nav_col4:
         st.switch_page("pages/4_量化模型后台.py")
     st.caption("期权定价 | 核保理赔 | 风险分析")
 with nav_col5:
-    if st.button("🏛️ 政府公益端", use_container_width=True, type="secondary"):
-        st.switch_page("pages/5_gov_public_welfare.py")   # ← 关键修复点：必须是这个英文文件名
+    st.page_link(
+        "pages/5_gov_public_welfare.py",
+        label="🏛️ 政府公益端",
+        icon="🏛️",
+        use_container_width=True
+    )
     st.caption("补贴透明 | 监管看板 | 区块链记录")
 
 st.divider()
