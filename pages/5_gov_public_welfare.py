@@ -48,12 +48,14 @@ if image_path.exists():
         color: #00bfff !important;
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }}
-    /* 醒目绿色：副标题 + 所有指标文字 */
-    .stMetricLabel, .stMetricValue, .stMetricDelta, p strong, .stMarkdown {{
-        color: #00cc66 !important;   /* 醒目翠绿 */
+    /* 副标题 + 所有指标文字（标签、数值、delta）全部改为深厚白色 */
+    .stMetricLabel, .stMetricValue, .stMetricDelta, 
+    p strong, .stMarkdown, .stMarkdown p {{
+        color: #ffffff !important;
         font-weight: bold;
+        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }}
-    /* 区块链提示 + 政策文件说明 → 深厚白色 */
+    /* 区块链提示 + 政策文件说明保持深厚白色 */
     .stSuccess, .stMarkdown strong {{
         color: #ffffff !important;
         font-weight: bold;
@@ -75,7 +77,7 @@ st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon
 # ==================== 顶部标题 + 指标（已删除白色卡片） ====================
 st.title("🏛️ 智护农安 · 政府公益监管端")
 
-# 副标题改为醒目绿色
+# 副标题改为深厚白色
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
 
 col1, col2, col3 = st.columns(3)
@@ -97,7 +99,7 @@ data = pd.DataFrame({
 })
 st.dataframe(data, use_container_width=True, hide_index=True)
 
-# 区块链提示改为深厚白色
+# 区块链提示（保持深厚白色）
 st.markdown("**所有补贴资金均通过区块链公开透明，确保每一分钱都用于乡村振兴和粮食安全保障**")
 
 st.subheader("🌱 公益帮扶效果")
@@ -110,7 +112,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.divider()
 st.subheader("📄 重要政策文件下载（政府监管依据）")
 
-# 政策文件说明改为深厚白色
+# 政策文件说明（保持深厚白色）
 st.markdown("**以下为当前重点政策文件，均涉及农业保险补贴、防止返贫和乡村振兴金融支持：**")
 
 # 文件1
@@ -146,4 +148,4 @@ if Path("assets/国务院乡村振兴意见.pdf").exists():
         st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
 
-st.success("✅ 已按要求修改颜色 + 删除顶部白色卡片")
+st.success("✅ 已按要求修改为深厚白色 + 顶部卡片已删除")
