@@ -29,15 +29,6 @@ if image_path.exists():
         background: rgba(0, 0, 0, 0.78);
         z-index: -1;
     }}
-    .header-card {{
-        background: rgba(255, 255, 255, 0.97) !important;
-        border-radius: 24px;
-        padding: 35px 40px 30px 40px !important;
-        margin: 10px 0 35px 0 !important;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
-        width: 100% !important;
-        color: #1a1a1a !important;
-    }}
     .policy-card {{
         background: rgba(255, 255, 255, 0.92) !important;
         border-radius: 12px;
@@ -57,13 +48,17 @@ if image_path.exists():
         color: #00bfff !important;
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }}
-    /* 所有你要求的文字全部改为醒目红色 */
-    .stMetricLabel, .stMetricDelta, .stSuccess, p, strong, .stMarkdown {{
-        color: #d32f2f !important;
+    /* 醒目绿色：副标题 + 所有指标文字 */
+    .stMetricLabel, .stMetricValue, .stMetricDelta, p strong, .stMarkdown {{
+        color: #00cc66 !important;   /* 醒目翠绿 */
+        font-weight: bold;
     }}
-    .stMetricValue {{
-        color: #ff4d4d !important;
+    /* 区块链提示 + 政策文件说明 → 深厚白色 */
+    .stSuccess, .stMarkdown strong {{
+        color: #ffffff !important;
+        font-weight: bold;
     }}
+    /* 下载按钮 */
     .stDownloadButton button {{
         background-color: #00bfff !important;
         color: white !important;
@@ -77,22 +72,20 @@ else:
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
-# ==================== 顶部标题 + 指标（完整白色卡片） ====================
-st.markdown('<div class="header-card">', unsafe_allow_html=True)
+# ==================== 顶部标题 + 指标（已删除白色卡片） ====================
 st.title("🏛️ 智护农安 · 政府公益监管端")
 
-# 副标题（红色）
-st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴", unsafe_allow_html=True)
+# 副标题改为醒目绿色
+st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
 
 col1, col2, col3 = st.columns(3)
 col1.metric("本年度补贴总额", "¥1.65亿", "广西试点")
 col2.metric("已智护小农户", "28.4万户", "↑ 2025")
 col3.metric("覆盖耕地面积", "312万亩", "全覆盖")
-st.markdown('</div>', unsafe_allow_html=True)
 
 st.divider()
 
-# ==================== 区块链记录 ====================
+# ==================== 其余内容 ====================
 st.subheader("🧾 政府补贴发放区块链记录（实时上链）")
 data = pd.DataFrame({
     "发放时间": ["2026-03-24 14:30", "2026-03-22 09:15", "2026-03-20 16:45"],
@@ -104,8 +97,8 @@ data = pd.DataFrame({
 })
 st.dataframe(data, use_container_width=True, hide_index=True)
 
-# 区块链提示（红色）
-st.success("所有补贴资金均通过区块链公开透明，确保每一分钱都用于乡村振兴和粮食安全保障")
+# 区块链提示改为深厚白色
+st.markdown("**所有补贴资金均通过区块链公开透明，确保每一分钱都用于乡村振兴和粮食安全保障**")
 
 st.subheader("🌱 公益帮扶效果")
 fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], y=[284000, 3120000, 85],
@@ -117,7 +110,7 @@ st.plotly_chart(fig, use_container_width=True)
 st.divider()
 st.subheader("📄 重要政策文件下载（政府监管依据）")
 
-# 政策文件说明（红色）
+# 政策文件说明改为深厚白色
 st.markdown("**以下为当前重点政策文件，均涉及农业保险补贴、防止返贫和乡村振兴金融支持：**")
 
 # 文件1
@@ -153,4 +146,4 @@ if Path("assets/国务院乡村振兴意见.pdf").exists():
         st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
 
-st.success("✅ 所有指定文字已改为红色 + 顶部卡片完整包裹")
+st.success("✅ 已按要求修改颜色 + 删除顶部白色卡片")
