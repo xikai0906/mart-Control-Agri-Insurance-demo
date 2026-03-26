@@ -1,6 +1,40 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import base64
+from pathlib import Path
+
+# ==================== 政府风背景 + 严谨样式 ====================
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+image_path = Path("assets/农民开怀大笑.png")
+if image_path.exists():
+    bg_base64 = get_base64_of_bin_file(str(image_path))
+    background_css = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/png;base64,{bg_base64}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    .stApp::before {{
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.68);
+        z-index: -1;
+    }}
+    h1, h2, h3, p, li {{ color: #f0f0f0 !important; }}
+    </style>
+    """
+    st.markdown(background_css, unsafe_allow_html=True)
+else:
+    st.error("❌ 未找到 assets/农民开怀大笑.png，请确认已放入 assets 文件夹")
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
@@ -13,6 +47,7 @@ col2.metric("已智护小农户", "28.4万户", "↑ 2025")
 col3.metric("覆盖耕地面积", "312万亩", "全覆盖")
 
 st.divider()
+
 st.subheader("🧾 政府补贴发放区块链记录（实时上链）")
 data = pd.DataFrame({
     "发放时间": ["2026-03-24 14:30", "2026-03-22 09:15", "2026-03-20 16:45"],
@@ -32,3 +67,32 @@ fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], y=[284000, 3
              color_discrete_sequence=["#166534"])
 fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
+
+# ==================== 重要政策文件下载区 ====================
+st.divider()
+st.subheader("📄 重要政策文件下载（政府监管依据）")
+
+st.markdown("**以下为当前重点政策文件，均涉及农业保险补贴、防止返贫和乡村振兴金融支持：**")
+
+# 文件1
+st.markdown("**1. 国家层面金融支持意见**（中国人民银行等四部门）")
+st.markdown("- **补贴核心**：调整脱贫人口小额信贷、农户信用贷款；新增资金优先投向乡村振兴重点帮扶县；支持粮油生产、农业全产业链和农村基础设施中长期贷款。")
+if Path("assets/国家金融支持意见.pdf").exists():
+    with open("assets/国家金融支持意见.pdf", "rb") as f:
+        st.download_button("📥 下载国家金融支持意见.pdf", data=f, file_name="国家金融支持意见.pdf", mime="application/pdf")
+
+# 文件2
+st.markdown("**2. 广西金融惠企三年行动方案（2025—2027年）**")
+st.markdown("- **补贴核心**：统筹75亿元财政资金，带动贴息贷款6000亿元以上；担保费率补贴0.2%-0.4%；每年支农支小再贷款不少于1000亿元。")
+if Path("assets/广西金融惠企方案.pdf").exists():
+    with open("assets/广西金融惠企方案.pdf", "rb") as f:
+        st.download_button("📥 下载广西金融惠企方案.pdf", data=f, file_name="广西金融惠企方案.pdf", mime="application/pdf")
+
+# 文件3
+st.markdown("**3. 中共中央 国务院 乡村全面振兴意见**（2026年国务院公报）")
+st.markdown("- **补贴核心**：粮食产量稳定1.4万亿斤；高标准农田建设；新一轮千亿斤粮食产能提升行动；加强农业保险、信贷支持。")
+if Path("assets/国务院乡村振兴意见.pdf").exists():
+    with open("assets/国务院乡村振兴意见.pdf", "rb") as f:
+        st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
+
+st.success("✅ 背景图 + 3个政策文件已就绪！")
