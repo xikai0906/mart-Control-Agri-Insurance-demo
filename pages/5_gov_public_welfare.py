@@ -4,7 +4,7 @@ import plotly.express as px
 import base64
 from pathlib import Path
 
-# ==================== 背景 + 统一卡片样式 ====================
+# ==================== 背景 + 加强卡片样式 ====================
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
@@ -22,22 +22,23 @@ if image_path.exists():
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
-    /* 整体遮罩稍加深 */
+    /* 整体遮罩加深 */
     .stApp::before {{
         content: "";
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
-        background: rgba(0, 0, 0, 0.75);
+        background: rgba(0, 0, 0, 0.78);
         z-index: -1;
     }}
-    /* 顶部标题 + 指标卡片 */
+    /* 顶部大卡片（标题+指标）——更高白度、更强效果 */
     .header-card {{
-        background: rgba(255, 255, 255, 0.93) !important;
-        border-radius: 16px;
-        padding: 24px 28px;
-        margin: 10px 0 25px 0;
-        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
+        background: rgba(255, 255, 255, 0.96) !important;
+        border-radius: 20px;
+        padding: 28px 32px;
+        margin: 15px 0 30px 0;
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
         color: #1a1a1a !important;
+        width: 100%;
     }}
     /* 政策文件卡片（保持不变） */
     .policy-card {{
@@ -82,7 +83,7 @@ else:
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
-# ==================== 顶部标题 + 指标（加白色卡片） ====================
+# ==================== 顶部标题 + 指标（加强卡片） ====================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 st.title("🏛️ 智护农安 · 政府公益监管端")
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
@@ -95,7 +96,7 @@ st.markdown('</div>', unsafe_allow_html=True)
 
 st.divider()
 
-# ==================== 区块链记录 ====================
+# ==================== 其余内容（不变） ====================
 st.subheader("🧾 政府补贴发放区块链记录（实时上链）")
 data = pd.DataFrame({
     "发放时间": ["2026-03-24 14:30", "2026-03-22 09:15", "2026-03-20 16:45"],
@@ -115,7 +116,6 @@ fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], y=[284000, 3
 fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
 
-# ==================== 政策文件区 ====================
 st.divider()
 st.subheader("📄 重要政策文件下载（政府监管依据）")
 st.markdown("**以下为当前重点政策文件，均涉及农业保险补贴、防止返贫和乡村振兴金融支持：**")
@@ -152,3 +152,5 @@ if Path("assets/国务院乡村振兴意见.pdf").exists():
     with open("assets/国务院乡村振兴意见.pdf", "rb") as f:
         st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
+
+st.success("✅ 顶部已使用更高白度、更厚卡片，现在清晰多了！")
