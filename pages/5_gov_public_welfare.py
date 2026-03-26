@@ -147,5 +147,3 @@ if Path("assets/国务院乡村振兴意见.pdf").exists():
     with open("assets/国务院乡村振兴意见.pdf", "rb") as f:
         st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
-
-st.success("✅ 已按要求修改为深厚白色 + 顶部卡片已删除")
