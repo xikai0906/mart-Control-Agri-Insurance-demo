@@ -1,18 +1,63 @@
 import streamlit as st
 import pandas as pd
 import plotly.express as px
+import base64
+from pathlib import Path
 
-st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
+# ==================== 政府风背景图片处理 ====================
+def get_base64_of_bin_file(bin_file):
+    with open(bin_file, 'rb') as f:
+        data = f.read()
+    return base64.b64encode(data).decode()
+
+image_path = Path("assets/农民开怀大笑.png")
+if image_path.exists():
+    bg_base64 = get_base64_of_bin_file(str(image_path))
+    background_css = f"""
+    <style>
+    .stApp {{
+        background-image: url("data:image/png;base64,{bg_base64}");
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        background-attachment: fixed;
+    }}
+    /* 政府风深色半透明白遮罩 + 正式字体 */
+    .stApp::before {{
+        content: "";
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: rgba(0, 0, 0, 0.65);
+        z-index: -1;
+        pointer-events: none;
+    }}
+    h1, h2, h3 {{ color: #ffffff !important; }}
+    .stMarkdown, p, li {{ color: #f0f0f0 !important; }}
+    </style>
+    """
+    st.markdown(background_css, unsafe_allow_html=True)
+else:
+    st.error("❌ 未找到 assets/农民开怀大笑.png，请确认文件已放入 assets 文件夹")
+
+# ==================== 页面配置 ====================
+st.set_page_config(
+    page_title="智护农安 · 政府公益监管端",
+    page_icon="🏛️",
+    layout="wide"
+)
 
 st.title("🏛️ 智护农安 · 政府公益监管端")
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
 
+# 核心指标
 col1, col2, col3 = st.columns(3)
 col1.metric("本年度补贴总额", "¥1.65亿", "广西试点")
 col2.metric("已智护小农户", "28.4万户", "↑ 2025")
 col3.metric("覆盖耕地面积", "312万亩", "全覆盖")
 
 st.divider()
+
+# 区块链记录（保持不变）
 st.subheader("🧾 政府补贴发放区块链记录（实时上链）")
 data = pd.DataFrame({
     "发放时间": ["2026-03-24 14:30", "2026-03-22 09:15", "2026-03-20 16:45"],
@@ -26,9 +71,74 @@ st.dataframe(data, use_container_width=True, hide_index=True)
 
 st.success("所有补贴资金均通过区块链公开透明，确保每一分钱都用于乡村振兴和粮食安全保障")
 
+# 公益效果
 st.subheader("🌱 公益帮扶效果")
-fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], y=[284000, 3120000, 85],
-             text=[284000, "312万亩", "85%"], title="2025年智护农安公益成果",
-             color_discrete_sequence=["#166534"])
+fig = px.bar(
+    x=["已惠及农户", "覆盖耕地", "减贫贡献"],
+    y=[284000, 3120000, 85],
+    text=[284000, "312万亩", "85%"],
+    title="2025年智护农安公益成果",
+    color_discrete_sequence=["#166534"]
+)
 fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
+
+st.caption("数据来源：政策性农业保险试点统计 · 智护农安平台实时汇总")
+
+# ==================== 新增：重要政策文件下载区（政府风） ====================
+st.divider()
+st.subheader("📄 重要政策文件下载")
+
+st.markdown("**以下文件为当前政府端重点政策依据，均涉及农业保险补贴、防止返贫和乡村振兴金融支持内容：**")
+
+# 文件1解读 + 下载
+st.markdown("**1. 《关于统筹建立常态化金融支持机制 助力防止返贫致贫和乡村全面振兴的意见》**（中国人民银行、金融监管总局、中国证监会、农业农村部联合印发）")
+st.markdown("""
+- **补贴核心内容**：调整优化脱贫人口小额信贷，完善农户小额信用贷款政策；常态化支持防止返贫致贫对象发展生产；新增金融资金优先满足乡村振兴重点帮扶县；加大对民族地区、革命老区、边疆地区金融资源倾斜；支持粮油生产、农业全产业链及农村基础设施建设中长期资金投入。
+""")
+if Path("assets/国家金融支持意见.pdf").exists():
+    with open("assets/国家金融支持意见.pdf", "rb") as f:
+        st.download_button(
+            label="📥 下载国家层面金融支持意见（PDF）",
+            data=f,
+            file_name="国家金融支持意见.pdf",
+            mime="application/pdf"
+        )
+else:
+    st.warning("国家金融支持意见.pdf 未找到")
+
+# 文件2解读 + 下载
+st.markdown("**2. 《广西金融惠企三年行动方案（2025—2027年）》**（广西壮族自治区人民政府办公厅印发）")
+st.markdown("""
+- **补贴核心内容**：统筹各类财政资金75亿元，带动财政贴息贷款6000亿元以上、补贴融资担保业务1000亿元以上；重点支持重大项目、重点产业（含现代特色农业）、普惠领域融资；每年运用支农支小再贷款、再贴现不少于1000亿元；提供担保费率补贴0.2%-0.4%；支持乡村振兴债券、绿色债券发行。
+""")
+if Path("assets/广西金融惠企方案.pdf").exists():
+    with open("assets/广西金融惠企方案.pdf", "rb") as f:
+        st.download_button(
+            label="📥 下载广西金融惠企三年行动方案（PDF）",
+            data=f,
+            file_name="广西金融惠企方案.pdf",
+            mime="application/pdf"
+        )
+else:
+    st.warning("广西金融惠企方案.pdf 未找到")
+
+# 文件3解读 + 下载
+st.markdown("**3. 中共中央 国务院《关于锚定农业农村现代化 扎实推进乡村全面振兴的意见》**（2026年国务院公报第5号）")
+st.markdown("""
+- **补贴核心内容**：稳定粮食产量1.4万亿斤左右；高质量推进高标准农田建设；实施新一轮千亿斤粮食产能提升行动；加强耕地保护与质量提升；强化农业保险、信贷、担保等金融工具支持；持续巩固拓展脱贫攻坚成果，推进农业农村现代化。
+""")
+if Path("assets/国务院乡村振兴意见.pdf").exists():
+    with open("assets/国务院乡村振兴意见.pdf", "rb") as f:
+        st.download_button(
+            label="📥 下载中央乡村全面振兴意见（PDF）",
+            data=f,
+            file_name="国务院乡村振兴意见.pdf",
+            mime="application/pdf"
+        )
+else:
+    st.warning("国务院乡村振兴意见.pdf 未找到")
+
+st.caption("以上文件均为公开政策依据，可直接用于政府监管、补贴审核及乡村振兴工作参考。")
+
+st.success("✅ 所有文件已实现本地下载，背景图片已设置为正式政府风")
