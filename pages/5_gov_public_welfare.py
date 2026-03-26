@@ -30,17 +30,18 @@ if image_path.exists():
         background: rgba(0, 0, 0, 0.78);
         z-index: -1;
     }}
-    /* 顶部大卡片（标题+指标）——更高白度、更强效果 */
+    /* 顶部大卡片（标题+副标题+3个指标）——完全包裹 */
     .header-card {{
-        background: rgba(255, 255, 255, 0.96) !important;
-        border-radius: 20px;
-        padding: 28px 32px;
-        margin: 15px 0 30px 0;
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.35);
+        background: rgba(255, 255, 255, 0.97) !important;
+        border-radius: 24px;
+        padding: 35px 40px 30px 40px !important;
+        margin: 10px 0 35px 0 !important;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4) !important;
+        width: 100% !important;
+        max-width: 100% !important;
         color: #1a1a1a !important;
-        width: 100%;
     }}
-    /* 政策文件卡片（保持不变） */
+    /* 政策文件卡片 */
     .policy-card {{
         background: rgba(255, 255, 255, 0.92) !important;
         border-radius: 12px;
@@ -59,7 +60,7 @@ if image_path.exists():
     /* 标题颜色 + 强阴影 */
     h1, h2, h3 {{
         color: #00bfff !important;
-        text-shadow: 0 4px 12px rgba(0,0,0,0.95);
+        text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }}
     /* 正文颜色 */
     p, li, .stMarkdown, .stSuccess, .stCaption {{
@@ -83,7 +84,7 @@ else:
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
-# ==================== 顶部标题 + 指标（加强卡片） ====================
+# ==================== 顶部标题 + 指标（完整大卡片） ====================
 st.markdown('<div class="header-card">', unsafe_allow_html=True)
 st.title("🏛️ 智护农安 · 政府公益监管端")
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
@@ -153,4 +154,4 @@ if Path("assets/国务院乡村振兴意见.pdf").exists():
         st.download_button("📥 下载中央乡村全面振兴意见.pdf", data=f, file_name="国务院乡村振兴意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
 
-st.success("✅ 顶部已使用更高白度、更厚卡片，现在清晰多了！")
+st.success("✅ 顶部已用更高白度、更厚卡片完全包裹，现在文字清晰不露背景！")
