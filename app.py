@@ -23,7 +23,7 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 # ====================== 主页标题 ======================
-st.markdown('<div class="main-header">🌾 智护农安</div>', unsafe_allow_html=True)
+st.markdown('<div class="main-header">🌾 智控农险</div>', unsafe_allow_html=True)
 st.markdown('<div class="sub-header">政府补贴 · 公益农险 · AI智能守护</div>', unsafe_allow_html=True)
 st.markdown("**助力乡村振兴 · 保障粮食安全 · 精准帮扶小农户**")
 
