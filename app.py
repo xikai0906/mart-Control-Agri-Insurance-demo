@@ -4,7 +4,7 @@ from datetime import datetime
 
 # ====================== 页面配置 ======================
 st.set_page_config(
-    page_title="智护农安 - 政府补贴公益农险平台",
+    page_title="智控农险 - 政府补贴公益农险平台",
     page_icon="🌾🛡️",
     layout="wide",
     initial_sidebar_state="expanded"
