@@ -5,7 +5,7 @@ from pathlib import Path
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
-# ==================== 简单纯色背景（避免 base64 语法问题） ====================
+# ==================== 简单纯色背景（避免之前 base64 解析问题） ====================
 st.markdown("""
 <style>
     .stApp {
@@ -61,7 +61,7 @@ fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
 st.divider()
 
-# ====================== 政府公益风险综合解决方案（核心新增内容） ======================
+# ====================== 政府公益风险综合解决方案 ======================
 st.subheader("🌟 政府公益风险综合解决方案")
 st.markdown("**服务整合** · 地域灾害风险监测和预警 + 灾中智能响应 + 灾后高效理赔 + 灾害数据·保险数据融合 → 一键打包生成风险方案")
 st.info("本平台已实现全链路服务整合，为政府提供“一站式”区域风险管理打包方案，助力精准补贴、快速响应与乡村振兴")
@@ -120,9 +120,10 @@ if st.button("🚀 生成当前广西试点区域风险方案", type="primary", 
     st.success("✅ 风险方案生成完成！（已打包为政府决策参考文件）")
     st.dataframe(scheme_data, use_container_width=True, hide_index=True)
     
+    # 【关键修复】这里改成 .encode("utf-8")，不再使用 b"" 直接写中文
     st.download_button(
         label="📥 下载《广西试点区域公益风险管理打包方案.pdf》",
-        data=b"模拟打包方案文件内容（实际部署时替换为真实PDF）",
+        data="模拟打包方案文件内容（实际部署时替换为真实PDF）".encode("utf-8"),
         file_name="广西试点区域公益风险管理打包方案.pdf",
         mime="application/pdf"
     )
