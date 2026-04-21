@@ -12,63 +12,61 @@ def get_base64_of_bin_file(bin_file):
     return base64.b64encode(data).decode()
 
 image_path = Path("assets/农民开怀大笑.png")
+
 if image_path.exists():
     bg_base64 = get_base64_of_bin_file(str(image_path))
-    background_css = f"""
+    background_css = """
     <style>
-    .stApp {{
-        background-image: url("data:image/png;base64,{bg_base64}");
+    .stApp {
+        background-image: url("data:image/png;base64,{{bg}}");
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
         background-attachment: fixed;
-    }}
-    .stApp::before {{
+    }
+    .stApp::before {
         content: "";
         position: absolute;
         top: 0; left: 0; width: 100%; height: 100%;
         background: rgba(0, 0, 0, 0.78);
         z-index: -1;
-    }}
-    .policy-card {{
+    }
+    .policy-card {
         background: rgba(255, 255, 255, 0.92) !important;
         border-radius: 12px;
         padding: 20px 24px;
         margin: 15px 0;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         color: #1a1a1a !important;
-    }}
-    .policy-card h4 {{
+    }
+    .policy-card h4 {
         color: #0066cc !important;
         margin-bottom: 12px;
-    }}
-    .policy-card p {{
+    }
+    .policy-card p {
         color: #003300 !important;
-    }}
-    h1, h2, h3 {{
+    }
+    h1, h2, h3 {
         color: #00bfff !important;
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
-    }}
-    /* 副标题 + 所有指标文字（标签、数值、delta）全部改为深厚白色 */
+    }
     .stMetricLabel, .stMetricValue, .stMetricDelta,
-    p strong, .stMarkdown, .stMarkdown p {{
+    p strong, .stMarkdown, .stMarkdown p {
         color: #ffffff !important;
         font-weight: bold;
         text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }}
-    /* 区块链提示 + 政策文件说明保持深厚白色 */
-    .stSuccess, .stMarkdown strong {{
+    }
+    .stSuccess, .stMarkdown strong {
         color: #ffffff !important;
         font-weight: bold;
-    }}
-    /* 下载按钮 */
-    .stDownloadButton button {{
+    }
+    .stDownloadButton button {
         background-color: #00bfff !important;
         color: white !important;
         border-radius: 8px;
-    }}
+    }
     </style>
-    """
+    """.replace("{{bg}}", bg_base64)
     st.markdown(background_css, unsafe_allow_html=True)
 else:
     st.error("❌ 未找到 assets/农民开怀大笑.png")
@@ -101,11 +99,13 @@ st.markdown("**所有补贴资金均通过区块链公开透明，确保每一�
 
 # ==================== 公益帮扶效果 ====================
 st.subheader("🌱 公益帮扶效果")
-fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], 
-             y=[284000, 3120000, 85],
-             text=[284000, "312万亩", "85%"], 
-             title="2025年智护农安公益成果",
-             color_discrete_sequence=["#00bfff"])
+fig = px.bar(
+    x=["已惠及农户", "覆盖耕地", "减贫贡献"],
+    y=[284000, 3120000, 85],
+    text=[284000, "312万亩", "85%"],
+    title="2025年智护农安公益成果",
+    color_discrete_sequence=["#00bfff"]
+)
 fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
 st.divider()
