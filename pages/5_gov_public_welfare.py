@@ -51,9 +51,9 @@ if image_path.exists():
         color: #00bfff !important;
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }
-    .stMetricLabel, .stMetricValue, .stMetricDelta,
-    p strong, .stMarkdown, .stMarkdown p {
-        color: #ffffff !important;
+    /* 顶部三个 st.metric 的所有文字改为红色 */
+    .stMetricLabel, .stMetricValue, .stMetricDelta {
+        color: #ff0000 !important;
         font-weight: bold;
         text-shadow: 0 2px 4px rgba(0,0,0,0.8);
     }
