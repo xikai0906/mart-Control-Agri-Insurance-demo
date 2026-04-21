@@ -3,13 +3,11 @@ import pandas as pd
 import plotly.express as px
 import base64
 from pathlib import Path
-
 # ==================== 背景 + 卡片样式 ====================
 def get_base64_of_bin_file(bin_file):
     with open(bin_file, 'rb') as f:
         data = f.read()
     return base64.b64encode(data).decode()
-
 image_path = Path("assets/农民开怀大笑.png")
 if image_path.exists():
     bg_base64 = get_base64_of_bin_file(str(image_path))
@@ -49,7 +47,7 @@ if image_path.exists():
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }}
     /* 副标题 + 所有指标文字（标签、数值、delta）全部改为深厚白色 */
-    .stMetricLabel, .stMetricValue, .stMetricDelta, 
+    .stMetricLabel, .stMetricValue, .stMetricDelta,
     p strong, .stMarkdown, .stMarkdown p {{
         color: #ffffff !important;
         font-weight: bold;
@@ -71,22 +69,16 @@ if image_path.exists():
     st.markdown(background_css, unsafe_allow_html=True)
 else:
     st.error("❌ 未找到 assets/农民开怀大笑.png")
-
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
-
 # ==================== 顶部标题 + 指标（已删除白色卡片） ====================
 st.title("🏛️ 智护农安 · 政府公益监管端")
-
 # 副标题改为深厚白色
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
-
 col1, col2, col3 = st.columns(3)
 col1.metric("本年度补贴总额", "¥1.65亿", "广西试点")
 col2.metric("已智护小农户", "28.4万户", "↑ 2025")
 col3.metric("覆盖耕地面积", "312万亩", "全覆盖")
-
 st.divider()
-
 # ==================== 其余内容 ====================
 st.subheader("🧾 政府补贴发放区块链记录（实时上链）")
 data = pd.DataFrame({
@@ -98,23 +90,86 @@ data = pd.DataFrame({
     "状态": ["✅ 已上链", "✅ 已上链", "✅ 已上链"]
 })
 st.dataframe(data, use_container_width=True, hide_index=True)
-
 # 区块链提示（保持深厚白色）
 st.markdown("**所有补贴资金均通过区块链公开透明，确保每一分钱都用于乡村振兴和粮食安全保障**")
-
 st.subheader("🌱 公益帮扶效果")
 fig = px.bar(x=["已惠及农户", "覆盖耕地", "减贫贡献"], y=[284000, 3120000, 85],
              text=[284000, "312万亩", "85%"], title="2025年智护农安公益成果",
              color_discrete_sequence=["#00bfff"])
 fig.update_traces(textposition='auto')
 st.plotly_chart(fig, use_container_width=True)
+st.divider()
+
+# ====================== 新增：政府公益风险综合解决方案（服务整合） ======================
+st.subheader("🌟 政府公益风险综合解决方案")
+st.markdown("**服务整合 · 地域灾害风险监测和预警 + 灾中智能响应 + 灾后高效理赔 + 灾害数据·保险数据融合 → 一键打包生成风险方案**")
+st.info("本平台已实现全链路服务整合，为政府提供“一站式”区域风险管理打包方案，助力精准补贴、快速响应与乡村振兴")
+
+col_service1, col_service2, col_service3, col_service4 = st.columns(4)
+
+with col_service1:
+    st.markdown("""
+    <div class="policy-card">
+        <h4>🌍 地域灾害风险监测与预警</h4>
+        <p>实时整合气象卫星、遥感影像与历史灾害数据，实现县域级高精度风险热力图与30天滚动预警</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_service2:
+    st.markdown("""
+    <div class="policy-card">
+        <h4>🚨 灾中智能响应</h4>
+        <p>AI驱动的灾害发生后即时响应系统，自动推送应急指令、资源调度建议与农户预警短信</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_service3:
+    st.markdown("""
+    <div class="policy-card">
+        <h4>⚡ 灾后高效理赔</h4>
+        <p>AI图像识别+区块链智能合约，实现“秒级”理赔审核与补贴同步发放，理赔周期缩短99%</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col_service4:
+    st.markdown("""
+    <div class="policy-card">
+        <h4>📊 灾害·保险数据融合</h4>
+        <p>多源数据（灾害、气象、保险理赔、价格）实时融合，为政府提供决策级风险评估报告</p>
+    </div>
+    """, unsafe_allow_html=True)
 
 st.divider()
-st.subheader("📄 重要政策文件下载（政府监管依据）")
 
+st.subheader("📦 一键生成区域风险方案")
+st.markdown("**点击下方按钮，即可为指定区域生成完整《政府公益风险管理打包方案》**")
+
+if st.button("🚀 生成当前广西试点区域风险方案", type="primary", use_container_width=True):
+    with st.spinner("正在整合灾害监测、保险数据与补贴政策..."):
+        import time
+        time.sleep(1.8)
+    
+    scheme_data = pd.DataFrame({
+        "风险模块": ["地域灾害监测预警", "灾中智能响应", "灾后高效理赔", "数据融合分析"],
+        "覆盖范围": ["全广西14市", "实时响应", "2小时内完成", "灾害+保险全链路"],
+        "关键指标": ["30天预警准确率92%", "响应时间<5分钟", "理赔效率提升70%", "补贴透明度100%"],
+        "政府补贴支持": ["80%中央+地方", "应急资金联动", "区块链自动发放", "精准帮扶测算"]
+    })
+    
+    st.success("✅ 风险方案生成完成！（已打包为政府决策参考文件）")
+    st.dataframe(scheme_data, use_container_width=True, hide_index=True)
+    st.download_button(
+        label="📥 下载《广西试点区域公益风险管理打包方案.pdf》",
+        data=b"模拟打包方案文件内容（实际部署时替换为真实PDF）",
+        file_name="广西试点区域公益风险管理打包方案.pdf",
+        mime="application/pdf"
+    )
+
+st.divider()
+# ==================== 重要政策文件下载（政府监管依据） ====================
+st.subheader("📄 重要政策文件下载（政府监管依据）")
 # 政策文件说明（保持深厚白色）
 st.markdown("**以下为当前重点政策文件，均涉及农业保险补贴、防止返贫和乡村振兴金融支持：**")
-
 # 文件1
 st.markdown("""
 <div class="policy-card">
@@ -125,7 +180,6 @@ if Path("assets/国家金融支持意见.pdf").exists():
     with open("assets/国家金融支持意见.pdf", "rb") as f:
         st.download_button("📥 下载国家金融支持意见.pdf", data=f, file_name="国家金融支持意见.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
-
 # 文件2
 st.markdown("""
 <div class="policy-card">
@@ -136,7 +190,6 @@ if Path("assets/广西金融惠企方案.pdf").exists():
     with open("assets/广西金融惠企方案.pdf", "rb") as f:
         st.download_button("📥 下载广西金融惠企方案.pdf", data=f, file_name="广西金融惠企方案.pdf", mime="application/pdf")
 st.markdown("</div>", unsafe_allow_html=True)
-
 # 文件3
 st.markdown("""
 <div class="policy-card">
