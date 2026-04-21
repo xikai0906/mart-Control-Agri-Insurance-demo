@@ -51,12 +51,6 @@ if image_path.exists():
         color: #00bfff !important;
         text-shadow: 0 4px 12px rgba(0,0,0,0.95) !important;
     }
-    /* 顶部三个 st.metric 的所有文字改为红色 */
-    .stMetricLabel, .stMetricValue, .stMetricDelta {
-        color: #ff0000 !important;
-        font-weight: bold;
-        text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-    }
     .stSuccess, .stMarkdown strong {
         color: #ffffff !important;
         font-weight: bold;
@@ -74,14 +68,40 @@ else:
 
 st.set_page_config(page_title="智护农安 · 政府公益监管端", page_icon="🏛️", layout="wide")
 
-# ==================== 顶部标题 + 指标 ====================
+# ==================== 顶部标题 + 红色指标（已改为自定义HTML强制红色） ====================
 st.title("🏛️ 智护农安 · 政府公益监管端")
 st.markdown("**政策性农业保险补贴透明看板** —— 中央+地方财政联合补贴 · 服务乡村振兴")
 
+# 自定义红色指标卡片（保证颜色一定生效）
 col1, col2, col3 = st.columns(3)
-col1.metric("本年度补贴总额", "¥1.65亿", "广西试点")
-col2.metric("已智护小农户", "28.4万户", "↑ 2025")
-col3.metric("覆盖耕地面积", "312万亩", "全覆盖")
+
+with col1:
+    st.markdown("""
+    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #ff0000;">
+        <p style="color: #ff0000; font-size: 1.1rem; margin: 0; font-weight: bold;">本年度补贴总额</p>
+        <h2 style="color: #ff0000; margin: 8px 0 0 0; font-size: 2.2rem;">¥1.65亿</h2>
+        <p style="color: #ff0000; margin: 0; font-size: 1.1rem;">广西试点</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col2:
+    st.markdown("""
+    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #ff0000;">
+        <p style="color: #ff0000; font-size: 1.1rem; margin: 0; font-weight: bold;">已智护小农户</p>
+        <h2 style="color: #ff0000; margin: 8px 0 0 0; font-size: 2.2rem;">28.4万户</h2>
+        <p style="color: #ff0000; margin: 0; font-size: 1.1rem;">↑ 2025</p>
+    </div>
+    """, unsafe_allow_html=True)
+
+with col3:
+    st.markdown("""
+    <div style="background: rgba(255,255,255,0.1); border-radius: 12px; padding: 20px; text-align: center; border: 2px solid #ff0000;">
+        <p style="color: #ff0000; font-size: 1.1rem; margin: 0; font-weight: bold;">覆盖耕地面积</p>
+        <h2 style="color: #ff0000; margin: 8px 0 0 0; font-size: 2.2rem;">312万亩</h2>
+        <p style="color: #ff0000; margin: 0; font-size: 1.1rem;">全覆盖</p>
+    </div>
+    """, unsafe_allow_html=True)
+
 st.divider()
 
 # ==================== 政府补贴发放区块链记录 ====================
